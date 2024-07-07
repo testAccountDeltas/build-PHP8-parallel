@@ -4,6 +4,7 @@ title build php
 
 set "dirRun=%~dp0\"
 
+set DEPS=
 set SNAP=
 set OPTIONS=
 
@@ -83,7 +84,7 @@ echo Build a debug version?? (Y/N)
 set /p ANSWER=
 if /I "%ANSWER%"=="Y" (
     set OPTIONS=%OPTIONS% --enable-debug
-	set isDebugInfo=debug
+	set isDebugInfo=Debug
 )
 
 set isSharedInfo=no-shared
@@ -193,19 +194,17 @@ if EXIST config.nice.bat (
 
 if %buildNew%==1 (
 	call buildconf --force --add-modules-dir=..\pecl\ 
-    call configure --enable-zts --enable-cli --with-ffi%SHARE% --with-iconv --enable-phar%SHARE% --enable-filter%SHARE% --with-openssl%SHARE% --enable-sockets%SHARE% --enable-mbstring%SHARE% --with-libxml%SHARE% --enable-fileinfo%SHARE% --enable-xmlwriter%SHARE% --enable-tokenizer%SHARE% --enable-embed --with-parallel%SHARE% %OPTIONS%
+    call configure --enable-zts --enable-cli --with-curl%SHARE% --with-ffi%SHARE% --with-iconv --enable-phar%SHARE% --enable-filter%SHARE% --with-openssl%SHARE% --enable-sockets%SHARE% --enable-mbstring%SHARE% --with-libxml%SHARE% --enable-fileinfo%SHARE% --enable-xmlwriter%SHARE% --enable-tokenizer%SHARE% --enable-embed --with-parallel%SHARE% %OPTIONS%
     nmake %SNAP%
 	
     cd ..\..\..\..\..
 )
 
 set dirPathExe
-if EXIST %downloadDir%\%ARCH%\Release_TS (
-	set dirPathExe=%downloadDir%\%ARCH%\Release_TS
+if EXIST %downloadDir%\%ARCH%\%isDebugInfo%_TS (
+	set dirPathExe=%downloadDir%\%ARCH%\%isDebugInfo%_TS
 )
-if EXIST %downloadDir%\%ARCH%\Debug_TS (
-	set dirPathExe=%downloadDir%\%ARCH%\Debug_TS
-)
+
 copy /Y %pathPHP%\deps\bin\%DEPS%*.dll %dirPathExe%
 
 echo @echo off> windows_run_test.bat

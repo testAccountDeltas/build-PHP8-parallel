@@ -150,16 +150,15 @@ if NOT EXIST "%pathPHP%\pecl" ( mkdir "%pathPHP%\pecl" )
 if NOT EXIST "%pathPHP%\pecl\parallel" ( mklink /j "%pathPHP%\pecl\parallel" "%parallelPath%" )
 
 set "downloadDir=%pathPHP%\php-%PHP_VER%"
-if NOT EXIST "%downloadDir%" (
-    mkdir "%downloadDir%"
-    curl -L https://github.com/php/php-src/archive/refs/tags/php-%PHP_VER%.tar.gz -o "%downloadDir%\php-%PHP_VER%.tar.gz"
-    tar xzf "%downloadDir%\php-%PHP_VER%.tar.gz" -C "%downloadDir%" --strip-components 1
-	del "%downloadDir%\php-%PHP_VER%.tar.gz"
-)
+if NOT EXIST "%downloadDir%" ( mkdir "%downloadDir%" )
 
+set "phpArhive=%downloadDir%\php-%PHP_VER%.tar.gz"
+if not exist "%phpArhive%" (
+  curl -L https://github.com/php/php-src/archive/refs/tags/php-%PHP_VER%.tar.gz -o "%phpArhive%"
+)
+if NOT EXIST "%downloadDir%\buildconf.bat" ( tar xzf "%phpArhive%" -C "%downloadDir%" --strip-components 1 )
 
 cd %PHP_SDK_RUN_FROM_ROOT%
-
 
 call bin\phpsdk_setshell.bat %CRT% %ARCH%
 call bin\phpsdk_setvars.bat
@@ -198,20 +197,28 @@ if %buildNew%==1 (
     cd ..\..\..\..\..
 )
 
+
+
+set dirPathExe=%downloadDir%\%ARCH%\%isDebugInfo%_TS
+if EXIST "%dirPathExe%\tmp-php.ini" (
+	ren "%dirPathExe%\tmp-php.ini" php.ini
+)
+
 set dirPathExe=%downloadDir%\%ARCH%\%isDebugInfo%_TS
 if EXIST %dirPathExe% (
 	copy /Y %pathPHP%\deps\bin\%DEPS%*.dll %dirPathExe%
 
-	echo @echo off> windows_run_test.bat
-	echo cd %dirPathExe%>> windows_run_test.bat
-	echo IF EXIST php.exe (>> windows_run_test.bat
-	echo     php -m>> windows_run_test.bat
-	echo     php -v>> windows_run_test.bat
-	echo     php %downloadDir%\run-tests.php --offline --show-diff --set-timeout 240 "%parallelPath%\tests">> windows_run_test.bat
-	echo     pause>> windows_run_test.bat
-	echo )>> windows_run_test.bat
+	(
+		echo @echo off
+		echo cd %dirPathExe%
+		echo IF EXIST php.exe ^(
+		echo    php -m
+		echo    php -v
+		echo    php %downloadDir%\run-tests.php --offline --show-diff --set-timeout 240 "%parallelPath%\tests"
+		echo    pause
+		echo ^)
+	) > windows_run_test_%PHP_VER%_%isDebugInfo%.bat
 )
-
 
 echo Assembly is complete.
 :end

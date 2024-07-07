@@ -2,8 +2,6 @@
 
 title build php
 
-set "dirRun=%~dp0\"
-
 set DEPS=
 set SNAP=
 set OPTIONS=

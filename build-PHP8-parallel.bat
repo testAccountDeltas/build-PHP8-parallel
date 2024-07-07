@@ -197,14 +197,11 @@ if %buildNew%==1 (
     cd ..\..\..\..\..
 )
 
-
-
 set dirPathExe=%downloadDir%\%ARCH%\%isDebugInfo%_TS
 if EXIST "%dirPathExe%\tmp-php.ini" (
 	ren "%dirPathExe%\tmp-php.ini" php.ini
 )
 
-set dirPathExe=%downloadDir%\%ARCH%\%isDebugInfo%_TS
 if EXIST %dirPathExe% (
 	copy /Y %pathPHP%\deps\bin\%DEPS%*.dll %dirPathExe%
 

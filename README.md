@@ -1,4 +1,4 @@
-parallel
+Building parallel and PHP8
 ========
 [![Windows](https://github.com/krakjoe/parallel/actions/workflows/windows.yml/badge.svg)](https://github.com/krakjoe/parallel/actions/workflows/windows.yml)
 

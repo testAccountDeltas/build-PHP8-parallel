@@ -5,39 +5,60 @@ title build php
 set DEPS=
 set SNAP=
 set OPTIONS=
+set PHP_VER=
+set PHP_DEBUG_SET=
+set PHP_SHARE_SET=
+set PHP_ARCH_SET=
+set PHP_FORCE_SET=
+
+:parse
+if "%~1" == "" goto endparse
+if "%~1" == "--php" set PHP_VER=%2
+if "%~1" == "--debug" set PHP_DEBUG_SET=%2
+if "%~1" == "--option" set OPTIONS=%2 %OPTIONS%
+if "%~1" == "--snap" set SNAP=snap
+if "%~1" == "--shared" set PHP_SHARE_SET=%2
+if "%~1" == "--arch" set PHP_ARCH_SET=%2
+if "%~1" == "--force" set PHP_FORCE_SET=%2
+
+shift
+goto parse
+:endparse
 
 setlocal enabledelayedexpansion
 
+if not "%PHP_VER%"=="" (
+	goto :phpCheck
+)
 echo Select PHP version or enter manually:
 set i=1
 for %%v in (8.0.30 8.1.28 8.2.5 8.2.20 8.3.8) do (
-    echo !i!. %%v
-    set "version[!i!]=%%v"
-    set /a i+=1
+	echo !i!. %%v
+	set "version[!i!]=%%v"
+	set /a i+=1
 )
 echo !i!. Enter your option
 
-set /p getPHPVersion=Enter the version number (1-!i!) or the version itself:
+set /p "getPHPVersion=Enter the version number (1-!i!) or the version itself:"
 
 if "%getPHPVersion%"=="" (
-    echo Unknown PHP version
-    goto :end
+	echo Unknown PHP version
+	goto :end
 )
 
-set "PHP_VER="
 if %getPHPVersion% geq 1 if %getPHPVersion% leq !i! (
-    for /L %%j in (1,1,%i%) do (
-        if !getPHPVersion! == %%j (
-            set "PHP_VER=!version[%%j]!"
-        )
-    )
+	for /L %%j in (1,1,%i%) do (
+		if !getPHPVersion! == %%j (
+			set "PHP_VER=!version[%%j]!"
+		)
+	)
 )
 
 if not defined PHP_VER (
-    set "PHP_VER=%getPHPVersion%"
+	set "PHP_VER=%getPHPVersion%"
 )
 
-
+:phpCheck
 for /f "tokens=1-2 delims=." %%a in ("%PHP_VER%") do (
     set PHP_MAJOR=%%a
     set PHP_MINOR=%%b
@@ -65,34 +86,69 @@ if %PHP_MAJOR%==7 (
     goto :end
 )
 
-echo BUILD PHP x86 assembly? (Y/N)
+REM ARCH SET INFO
+if /I "%PHP_ARCH_SET%"=="x86" (
+	set "ARCH=x86"
+	set "vcvars=vcvars32.bat"
+	goto :goARCH
+) else if /I "%PHP_ARCH_SET%"=="x64" (
+	set "ARCH=x64"
+	set "vcvars=vcvars64.bat"
+	goto :goARCH
+)
+echo "BUILD PHP x86 assembly? (Y/N)"
 set /p is32Bit=
 
 if /I "%is32Bit%"=="Y" (
-    set "ARCH=x86"
-    set "vcvars=vcvars32.bat"
+	set "ARCH=x86"
+	set "vcvars=vcvars32.bat"
 ) else (
-    set "ARCH=x64"
-    set "vcvars=vcvars64.bat"
+	set "ARCH=x64"
+	set "vcvars=vcvars64.bat"
 )
+:goARCH
+REM END ARCH SET INFO
 
+REM DEBUG SET INFO
+if "%PHP_DEBUG_SET%"=="0" (
+	set isDebugInfo=Release
+	goto :goIsDebugInfo
+) else if "%PHP_DEBUG_SET%"=="1" (
+	set isDebugInfo=Debug
+	set OPTIONS=%OPTIONS% --enable-debug
+	goto :goIsDebugInfo
+)
 
 set isDebugInfo=Release
-echo Build a debug version?? (Y/N)
+echo "Build a debug version?? (Y/N)"
 set /p ANSWER=
 if /I "%ANSWER%"=="Y" (
-    set OPTIONS=%OPTIONS% --enable-debug
+	set OPTIONS=%OPTIONS% --enable-debug
 	set isDebugInfo=Debug
 )
+:goIsDebugInfo
+REM END DEBUG SET INFO
 
+REM SHARE SET INFO
+if "%PHP_SHARE_SET%"=="0" (
+	set isSharedInfo=no-shared
+	set SHARE=
+	goto :goShared
+) else if "%PHP_SHARE_SET%"=="1" (
+	set SHARE==shared
+	set isSharedInfo=Shared
+	goto :goShared
+)
 set isSharedInfo=no-shared
 set SHARE=
-echo Collect extensions as SHARE? (Y/N)
+echo "Collect extensions as SHARE? (Y/N)"
 set /p ANSWER=
 if /I "%ANSWER%"=="Y" (
-    set SHARE==shared
+	set SHARE==shared
 	set isSharedInfo=Shared
 )
+:goShared
+REM END SHARE SET INFO
 
 set "titleSetBuild=Selected version php %PHP_VER% (%ARCH%, %CRT%, %isDebugInfo%, %isSharedInfo%)"
 echo %titleSetBuild%
@@ -178,6 +234,16 @@ if NOT EXIST "%pathPHP%\deps\bin\pthreadVC3.dll" (
 )
 
 set buildNew=1
+if "%PHP_FORCE_SET%"=="0" (
+	set buildNew=0
+	call config.nice.bat
+	nmake %SNAP%
+	cd ..\..\..\..\..
+	goto :goFORCE
+) else if "%PHP_FORCE_SET%"=="1" (
+	goto :goFORCE
+)
+
 if EXIST config.nice.bat (
 	echo "Do you want to build force??? (Y/N)"
 	set /p Isforce=
@@ -188,6 +254,7 @@ if EXIST config.nice.bat (
 		cd ..\..\..\..\..
 	)
 )
+:goFORCE
 
 if %buildNew%==1 (
 	call buildconf --force --add-modules-dir=..\pecl\ 
@@ -197,11 +264,13 @@ if %buildNew%==1 (
     cd ..\..\..\..\..
 )
 
+
 set dirPathExe=%downloadDir%\%ARCH%\%isDebugInfo%_TS
 if EXIST "%dirPathExe%\tmp-php.ini" (
 	ren "%dirPathExe%\tmp-php.ini" php.ini
 )
 
+set dirPathExe=%downloadDir%\%ARCH%\%isDebugInfo%_TS
 if EXIST %dirPathExe% (
 	copy /Y %pathPHP%\deps\bin\%DEPS%*.dll %dirPathExe%
 

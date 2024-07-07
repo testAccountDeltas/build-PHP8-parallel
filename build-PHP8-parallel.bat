@@ -198,22 +198,19 @@ if %buildNew%==1 (
     cd ..\..\..\..\..
 )
 
-set dirPathExe
-if EXIST %downloadDir%\%ARCH%\%isDebugInfo%_TS (
-	set dirPathExe=%downloadDir%\%ARCH%\%isDebugInfo%_TS
+set dirPathExe=%downloadDir%\%ARCH%\%isDebugInfo%_TS
+if EXIST %dirPathExe% (
+	copy /Y %pathPHP%\deps\bin\%DEPS%*.dll %dirPathExe%
+
+	echo @echo off> windows_run_test.bat
+	echo cd %dirPathExe%>> windows_run_test.bat
+	echo IF EXIST php.exe (>> windows_run_test.bat
+	echo     php -m>> windows_run_test.bat
+	echo     php -v>> windows_run_test.bat
+	echo     php %downloadDir%\run-tests.php --offline --show-diff --set-timeout 240 "%parallelPath%\tests">> windows_run_test.bat
+	echo     pause>> windows_run_test.bat
+	echo )>> windows_run_test.bat
 )
-
-copy /Y %pathPHP%\deps\bin\%DEPS%*.dll %dirPathExe%
-
-echo @echo off> windows_run_test.bat
-echo cd %dirPathExe%>> windows_run_test.bat
-echo IF EXIST php.exe (>> windows_run_test.bat
-echo     php -m>> windows_run_test.bat
-echo     php -v>> windows_run_test.bat
-echo     php %downloadDir%\run-tests.php --offline --show-diff --set-timeout 240 "%parallelPath%\tests">> windows_run_test.bat
-echo     pause>> windows_run_test.bat
-echo )>> windows_run_test.bat
-
 
 
 echo Assembly is complete.

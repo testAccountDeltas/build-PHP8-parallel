@@ -32,7 +32,7 @@ if not "%PHP_VER%"=="" (
 )
 echo Select PHP version or enter manually:
 set i=1
-for %%v in (8.0.30 8.1.28 8.2.5 8.2.20 8.3.8) do (
+for %%v in (8.0.30 8.1.28 8.2.5 8.2.20 8.3.8 8.3.9) do (
 	echo !i!. %%v
 	set "version[!i!]=%%v"
 	set /a i+=1
@@ -130,9 +130,9 @@ if /I "%ANSWER%"=="Y" (
 REM END DEBUG SET INFO
 
 REM SHARE SET INFO
+set SHARE=
 if "%PHP_SHARE_SET%"=="0" (
 	set isSharedInfo=no-shared
-	set SHARE=
 	goto :goShared
 ) else if "%PHP_SHARE_SET%"=="1" (
 	set SHARE==shared
@@ -140,7 +140,6 @@ if "%PHP_SHARE_SET%"=="0" (
 	goto :goShared
 )
 set isSharedInfo=no-shared
-set SHARE=
 echo "Collect extensions as SHARE? (Y/N)"
 set /p ANSWER=
 if /I "%ANSWER%"=="Y" (
@@ -292,6 +291,7 @@ if EXIST "%dirPathExe%" (
 	) > windows_run_test_%PHP_VER%_%isDebugInfo%.bat
 )
 
+title Assembly is complete.
 echo Assembly is complete.
 :end
 pause

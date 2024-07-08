@@ -288,7 +288,7 @@ if EXIST "%dirPathExe%" (
 		echo    php "%downloadDir%\run-tests.php" --offline --show-diff --set-timeout 240 "%parallelPath%\tests"
 		echo    pause
 		echo ^)
-	) > windows_run_test_%PHP_VER%_%isDebugInfo%.bat
+	) > windows_run_test_%PHP_VER%_%ARCH%_%isDebugInfo%.bat
 )
 
 title Assembly is complete.

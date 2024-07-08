@@ -22,6 +22,13 @@ Supported versions for selection [PHP 8.0.30 8.1.28 8.2.5 8.2.20 8.3.8](https://
 
 --------------------------------------------------------------------
 
+```
+build-PHP8-parallel.bat
+build-PHP8-parallel.bat --arch x64 --php 8.3.8 --debug 0 --shared 1 --force 0
+build-PHP8-parallel.bat --arch x86 --php 8.2.5 --debug 1 --shared 1 --force 1
+```
+
+--------------------------------------------------------------------
 
 Hello World
 ===========

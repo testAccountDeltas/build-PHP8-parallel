@@ -1,6 +1,5 @@
 Building parallel and PHP8
 ========
-[![Windows](https://github.com/krakjoe/parallel/actions/workflows/windows.yml/badge.svg)](https://github.com/krakjoe/parallel/actions/workflows/windows.yml)
 
 --------------------------------------------------------------------
 To build [php](https://github.com/php/php-src) [parallel](https://github.com/krakjoe/parallel) on [windows 10](https://www.microsoft.com/ru-ru/software-download/windows10)+

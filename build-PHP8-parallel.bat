@@ -150,7 +150,9 @@ if /I "%ANSWER%"=="Y" (
 :goShared
 REM END SHARE SET INFO
 
-set "titleSetBuild=Selected version php %PHP_VER% (%ARCH%, %CRT%, %isDebugInfo%, %isSharedInfo%)"
+set "titleSetBuild=Selected version php %PHP_VER% ^(%ARCH%^, %CRT%^, %isDebugInfo%^, %isSharedInfo%^)"
+set "titleSetBuildNice=%titleSetBuild% ^(nice^)"
+set "titleSetBuildForce=%titleSetBuild% ^(force^)"
 echo %titleSetBuild%
 title %titleSetBuild%
 
@@ -235,11 +237,14 @@ if NOT EXIST "%pathPHP%\deps\bin\pthreadVC3.dll" (
 
 set buildNew=1
 if "%PHP_FORCE_SET%"=="0" (
-	set buildNew=0
-	call config.nice.bat
-	nmake %SNAP%
-	cd ..\..\..\..\..
-	goto :goFORCE
+	if EXIST config.nice.bat (
+		title %titleSetBuildNice%
+		set buildNew=0
+		call config.nice.bat
+		nmake %SNAP%
+		cd ..\..\..\..\..
+		goto :goFORCE
+	)
 ) else if "%PHP_FORCE_SET%"=="1" (
 	goto :goFORCE
 )
@@ -248,6 +253,7 @@ if EXIST config.nice.bat (
 	echo "Do you want to build force??? (Y/N)"
 	set /p Isforce=
 	if /I "%Isforce%"=="N" (
+		title %titleSetBuildNice%
 		set buildNew=0
 		call config.nice.bat
 		nmake %SNAP%
@@ -257,6 +263,7 @@ if EXIST config.nice.bat (
 :goFORCE
 
 if %buildNew%==1 (
+	title %titleSetBuildForce%
 	call buildconf --force --add-modules-dir=..\pecl\ 
     call configure --enable-zts --enable-cli --with-curl%SHARE% --with-ffi%SHARE% --with-iconv --enable-phar%SHARE% --enable-filter%SHARE% --with-openssl%SHARE% --enable-sockets%SHARE% --enable-mbstring%SHARE% --with-libxml%SHARE% --enable-fileinfo%SHARE% --enable-xmlwriter%SHARE% --enable-tokenizer%SHARE% --enable-embed --with-parallel%SHARE% %OPTIONS%
     nmake %SNAP%
@@ -270,17 +277,16 @@ if EXIST "%dirPathExe%\tmp-php.ini" (
 	ren "%dirPathExe%\tmp-php.ini" php.ini
 )
 
-set dirPathExe=%downloadDir%\%ARCH%\%isDebugInfo%_TS
-if EXIST %dirPathExe% (
-	copy /Y %pathPHP%\deps\bin\%DEPS%*.dll %dirPathExe%
+if EXIST "%dirPathExe%" (
+	copy /Y "%pathPHP%\deps\bin\%DEPS%*.dll" "%dirPathExe%"
 
 	(
 		echo @echo off
-		echo cd %dirPathExe%
+		echo cd "%dirPathExe%"
 		echo IF EXIST php.exe ^(
 		echo    php -m
 		echo    php -v
-		echo    php %downloadDir%\run-tests.php --offline --show-diff --set-timeout 240 "%parallelPath%\tests"
+		echo    php "%downloadDir%\run-tests.php" --offline --show-diff --set-timeout 240 "%parallelPath%\tests"
 		echo    pause
 		echo ^)
 	) > windows_run_test_%PHP_VER%_%isDebugInfo%.bat

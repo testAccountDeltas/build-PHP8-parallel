@@ -8,7 +8,7 @@ You just need to download [build-PHP8-parallel.bat](https://github.com/testAccou
 
 [Visual studio 2022](https://visualstudio.microsoft.com/ru/vs/community/) or [2019](https://learn.microsoft.com/ru-ru/visualstudio/releases/2019/redistribution#--download) build requirement
 
-Supported versions for selection [PHP 8.0.30 8.1.28 8.2.5 8.2.20 8.3.8](https://windows.php.net/downloads/releases/archives/)
+Supported versions for selection [PHP 8.0.30 8.1.28 8.2.5 8.2.20 8.3.8 8.3.9](https://windows.php.net/downloads/releases/archives/)
 
 --------------------------------------------------------------------
 
@@ -17,7 +17,7 @@ Supported versions for selection [PHP 8.0.30 8.1.28 8.2.5 8.2.20 8.3.8](https://
 
 Требование к сборке [Visual studio 2022](https://visualstudio.microsoft.com/ru/vs/community/) или [2019](https://learn.microsoft.com/ru-ru/visualstudio/releases/2019/redistribution#--download)
 
-Поддерживамые версии для выбора [PHP 8.0.30 8.1.28 8.2.5 8.2.20 8.3.8](https://windows.php.net/downloads/releases/archives/)
+Поддерживамые версии для выбора [PHP 8.0.30 8.1.28 8.2.5 8.2.20 8.3.8 8.3.9](https://windows.php.net/downloads/releases/archives/)
 
 
 --------------------------------------------------------------------
